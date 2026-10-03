@@ -23,6 +23,6 @@ test('top-level function names are unique across scripts', () => {
 test('index.html loads every script once, in dependency order', () => {
   const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
   const scripts = [...html.matchAll(/<script src="js\/([\w-]+\.js)"><\/script>/g)].map(m => m[1]);
-  assert.deepEqual(scripts, ['data.js', 'state.js', 'sim.js', 'storage.js', 'render.js', 'ui.js', 'input.js', 'main.js']);
+  assert.deepEqual(scripts, ['data.js', 'state.js', 'sim.js', 'storage.js', 'models.js', 'render.js', 'ui.js', 'input.js', 'main.js']);
   assert.deepEqual(scripts.slice().sort(), fs.readdirSync(dir).filter(f => f.endsWith('.js')).sort());
 });

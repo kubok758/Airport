@@ -103,6 +103,29 @@ const AIRLINES = [
   {id: 'premium', code: 'AU', name: 'Aurora First', kind: 'Премиальные', min: 85, gate: 3, terminal: 2, perDay: 4, deadline: 145, pay: 1.80, cls: 'wide'}
 ];
 
+// Aircraft paint schemes: contract airlines by id, other carriers by the two-letter flight code prefix.
+const LIVERIES = {
+  local: {body: '#f4f7f9', belly: '#d6e0e9', tail: '#2f6fd0', stripe: '#2f6fd0', accent: '#ffffff'},
+  swift: {body: '#ffffff', belly: '#e7ecef', tail: '#ff7a1a', stripe: '#ff7a1a', accent: '#ffd08a'},
+  amber: {body: '#f7f2e8', belly: '#e1d3ba', tail: '#e09a12', stripe: '#a8650a', accent: '#fff0c2'},
+  polar: {body: '#fbfdff', belly: '#cbdae5', tail: '#56b0e6', stripe: '#1d5d8e', accent: '#ffffff'},
+  atlas: {body: '#ffffff', belly: '#1f2f5a', tail: '#1f2f5a', stripe: '#c8323c', accent: '#e8edf5'},
+  business: {body: '#3b4149', belly: '#2a2f35', tail: '#caa24c', stripe: '#caa24c', accent: '#f5e3b1'},
+  premium: {body: '#f6f4fb', belly: '#c9c1e5', tail: '#6a4bc4', stripe: '#3fc4ad', accent: '#b9f5e6'},
+  CH: {body: '#fff8e8', belly: '#e6d4a6', tail: '#d4a537', stripe: '#d4a537', accent: '#ffffff'},
+  SK: {body: '#f3f6f4', belly: '#d5dfd8', tail: '#2f9e6b', stripe: '#2f9e6b', accent: '#c9f2dc'},
+  AZ: {body: '#ffffff', belly: '#dbe8f2', tail: '#2a8fd6', stripe: '#0d4f8b', accent: '#ffffff'},
+  NL: {body: '#eaf3fb', belly: '#9cc4e6', tail: '#1d6fc2', stripe: '#1d6fc2', accent: '#ffffff'},
+  BA: {body: '#f2f3f6', belly: '#2b3a67', tail: '#2b3a67', stripe: '#d0343f', accent: '#ffffff'},
+  VN: {body: '#f6f8f8', belly: '#cfdedf', tail: '#1f7f86', stripe: '#d6a93a', accent: '#f5df9c'},
+  AR: {body: '#ffffff', belly: '#cfe3f3', tail: '#7fb8e8', stripe: '#3d6fa8', accent: '#ffffff'},
+  GO: {body: '#fbfaf7', belly: '#e9e2d4', tail: '#f08c1d', stripe: '#3c3f44', accent: '#ffffff'},
+  CG: {body: '#ece9e3', belly: '#a99d8c', tail: '#7b5b3e', stripe: '#7b5b3e', accent: '#f2c98a'},
+  FX: {body: '#f5f4f8', belly: '#cfcbe0', tail: '#4d2d8c', stripe: '#ef7d22', accent: '#ef7d22'},
+  UP: {body: '#6b4e33', belly: '#4d3825', tail: '#4d3825', stripe: '#e3b23c', accent: '#e3b23c'}
+};
+const liveryKey = p => p.charter ? 'CH' : LIVERIES[p.airlineId] ? p.airlineId : LIVERIES[String(p.code).slice(0, 2)] ? String(p.code).slice(0, 2) : 'SK';
+
 const SLOTS = [{id: 0, label: 'Ночь · 00–06'}, {id: 1, label: 'Утро · 06–12'}, {id: 2, label: 'День · 12–18'}, {id: 3, label: 'Вечер · 18–24'}];
 
 const GROUPS = [

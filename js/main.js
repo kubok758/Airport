@@ -54,12 +54,13 @@ function frame(now) {
   const elapsed = Math.min((now - last) / 1000, .12);
   last = now;
   // Dialogs pause the airport so nothing happens behind them.
-  if (speed && $('modal').hidden) advance(elapsed * MINUTES_PER_SECOND * speed);
+  const gameDt = speed && $('modal').hidden ? elapsed * MINUTES_PER_SECOND * speed : 0;
+  if (gameDt) advance(gameDt);
   uiAccum += elapsed;
   saveAccum += elapsed;
   if (uiAccum > .34) { renderUI(); uiAccum = 0; }
   if (saveAccum > 8) { safeSave(true); saveAccum = 0; }
-  if (rendererReady) render(now);
+  if (rendererReady) render(now, gameDt);
   requestAnimationFrame(frame);
 }
 

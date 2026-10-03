@@ -165,8 +165,39 @@ function standLabel(b) {
   const list = G.buildings.filter(q => q.type === b.type).sort((a, c) => a.id - c.id);
   return (b.type === 'cargo' ? 'C' : b.type === 'runway' ? 'ВПП ' : 'G') + (list.indexOf(b) + 1);
 }
-function standPoint(b) { return b.type === 'cargo' ? localToWorld(b, 2, 1.95) : {x: b.x + b.w / 2, y: b.y + b.h / 2}; }
-function standHeading(b) { return b.type === 'cargo' ? (b.rot ? Math.PI / 2 : 0) : -Math.PI / 2; }
+// Nearest terminal to a gate, measured to the closest point of its footprint.
+function rectPoint(t, x, y) { return {x: clamp(x, t.x, t.x + t.w), y: clamp(y, t.y, t.y + t.h)}; }
+function gateTerminal(b) {
+  const cx = b.x + b.w / 2, cy = b.y + b.h / 2;
+  let best = null, bestD = Infinity;
+  for (const t of G.buildings) if (t.type === 'terminal') {
+    const q = rectPoint(t, cx, cy), d = Math.hypot(q.x - cx, q.y - cy);
+    if (d < bestD) { bestD = d; best = t; }
+  }
+  return best;
+}
+// Aircraft park nose-in towards the nearest facade, like at real contact stands.
+function gateHeading(b) {
+  const t = gateTerminal(b), cx = b.x + b.w / 2, cy = b.y + b.h / 2;
+  if (!t) return -Math.PI / 2;
+  const q = rectPoint(t, cx, cy), dx = q.x - cx, dy = q.y - cy;
+  return Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 0 : Math.PI) : (dy > 0 ? Math.PI / 2 : -Math.PI / 2);
+}
+function facadeDistance(b) {
+  const t = gateTerminal(b), h = gateHeading(b), cx = b.x + b.w / 2, cy = b.y + b.h / 2;
+  if (!t) return 3;
+  const fx = Math.round(Math.cos(h)), fy = Math.round(Math.sin(h));
+  return fx > 0 ? t.x - cx : fx < 0 ? cx - (t.x + t.w) : fy > 0 ? t.y - cy : cy - (t.y + t.h);
+}
+// Long aircraft back off from a close facade so the nose never pokes into the terminal.
+function standPoint(b, p = null) {
+  if (b.type === 'cargo') return localToWorld(b, 2, 1.95);
+  const c = {x: b.x + b.w / 2, y: b.y + b.h / 2};
+  if (!p) return c;
+  const h = gateHeading(b), shift = clamp(CLASS[p.class].len * .7 - (facadeDistance(b) - .15), 0, 1.2);
+  return {x: c.x - Math.cos(h) * shift, y: c.y - Math.sin(h) * shift};
+}
+function standHeading(b) { return b.type === 'cargo' ? (b.rot ? Math.PI / 2 : 0) : gateHeading(b); }
 
 // Breadth-first search over taxiways that skips tiles reserved by other aircraft; the whole path is claimed at once.
 function route(starts, ends, planeId, ignoreReservations = false) {
@@ -605,11 +636,11 @@ function stepPlane(p, dt) {
       break;
     case 'taxi_in':
       if (!g) { failFlight(p, p.code + ': стоянка исчезла, рейс отменён', 2); break; }
-      if (cruise(p, dt)) { const s = standPoint(g); p.state = 'dock'; p.angle = Math.atan2(s.y - p.y, s.x - p.x); }
+      if (cruise(p, dt)) { const s = standPoint(g, p); p.state = 'dock'; p.angle = Math.atan2(s.y - p.y, s.x - p.x); }
       break;
     case 'dock': {
       if (!g) { failFlight(p, p.code + ': стоянка исчезла, рейс отменён', 2); break; }
-      const s = standPoint(g), dx = s.x - p.x, dy = s.y - p.y, d = Math.hypot(dx, dy), step = Math.min(d, dt * .65);
+      const s = standPoint(g, p), dx = s.x - p.x, dy = s.y - p.y, d = Math.hypot(dx, dy), step = Math.min(d, dt * .65);
       if (d > 0) { p.x += dx / d * step; p.y += dy / d * step; }
       if (d < .015 || step >= d) {
         p.x = s.x; p.y = s.y;

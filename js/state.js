@@ -13,7 +13,8 @@ const perk = id => portfolio?.perks?.[id] || 0;
 const dims = (type, rot) => rot ? {w: TYPES[type].h, h: TYPES[type].w} : {w: TYPES[type].w, h: TYPES[type].h};
 
 // Building geometry is described in local coordinates: u runs along the unrotated width, v along the depth.
-function localToWorld(b, u, v) { return b.rot ? {x: b.x + v, y: b.y + u} : {x: b.x + u, y: b.y + v}; }
+// A rotated building is turned 90° clockwise (a true rotation, not a mirror, so triangle winding survives).
+function localToWorld(b, u, v) { return b.rot ? {x: b.x + TYPES[b.type].h - v, y: b.y + u} : {x: b.x + u, y: b.y + v}; }
 
 let bIndex = new Map(), bIndexFor = null, bIndexDirty = true;
 let topologyCache = null, topologyFor = null, topologyDirty = true;

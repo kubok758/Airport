@@ -219,3 +219,24 @@ test('a long run across every location stays healthy', () => {
     assert.ok(run('G.served') > 20, id + ' served ' + run('G.served'));
   }
 });
+
+test('aircraft park nose-in towards the terminal without touching the facade', () => {
+  const {run} = createGame();
+  const problems = run(`(() => {
+    const out = [];
+    for (const l of LOCATIONS) {
+      G = fresh(l.id); topologyDirty = true;
+      for (const g of G.buildings.filter(b => b.type === 'gate')) {
+        const t = gateTerminal(g), h = gateHeading(g);
+        for (const cls of ['regional', 'narrow', 'wide']) {
+          const p = {class: cls}, s = standPoint(g, p), nose = {x: s.x + Math.cos(h) * CLASS[cls].len * .7, y: s.y + Math.sin(h) * CLASS[cls].len * .7};
+          if (nose.x > t.x && nose.x < t.x + t.w && nose.y > t.y && nose.y < t.y + t.h) out.push(l.id + ' ' + cls + ' nose inside terminal');
+          const toward = (t.x + t.w / 2 - s.x) * Math.cos(h) + (t.y + t.h / 2 - s.y) * Math.sin(h);
+          if (toward <= 0) out.push(l.id + ' gate ' + g.id + ' faces away from the terminal');
+        }
+      }
+    }
+    return out;
+  })()`);
+  assert.deepEqual(Array.from(problems), []);
+});

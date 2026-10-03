@@ -150,7 +150,11 @@ async function importSave(file) {
   finally { $('importFile').value = ''; }
 }
 
+// Touch devices start on medium graphics (smaller shadow map, refreshed every other frame).
 function loadSettings() {
-  try { return {quality: 'high', particles: true, ...JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}')}; } catch (e) { return {quality: 'high', particles: true}; }
+  let touch = false;
+  try { touch = matchMedia('(pointer: coarse)').matches; } catch (e) {}
+  const defaults = {quality: touch ? 'medium' : 'high', particles: true};
+  try { return {...defaults, ...JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}')}; } catch (e) { return defaults; }
 }
 function storeSettings() { try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); } catch (e) {} }
