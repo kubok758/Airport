@@ -1,0 +1,15 @@
+{
+  "name": "Аэропорт-магнат 3D",
+  "short_name": "Аэропорт",
+  "description": "3D-симулятор аэропорта: полосы, терминалы, авиакомпании и сеть аэропортов.",
+  "lang": "ru",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "any",
+  "background_color": "#08111d",
+  "theme_color": "#0d1b2a",
+  "icons": [
+    {"src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"}
+  ]
+}

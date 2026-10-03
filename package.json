@@ -1,0 +1,12 @@
+{
+  "name": "airport-tycoon-3d",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Аэропорт-магнат 3D — браузерный симулятор аэропорта на чистом WebGL",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "test:e2e": "node tests/e2e.js",
+    "start": "npx --yes serve ."
+  },
+  "license": "UNLICENSED"
+}
